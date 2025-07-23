@@ -1,10 +1,14 @@
 import type { Config } from 'drizzle-kit';
+import { config } from 'dotenv';
+
+config({ path: '.env.development.local' });
 
 export default {
-  schema: './db/schema.ts',
-  out: './db/migrations',
-  driver: 'pg',
+  schema: './src/db/schema.ts',
+  out: './src/db/migrations',
+  dialect: 'turso',
   dbCredentials: {
-    connectionString: process.env.POSTGRES_URL!,
+    url: process.env.TURSO_DATABASE_URL!,
+    authToken: process.env.TURSO_AUTH_TOKEN!,
   },
 } satisfies Config;

@@ -20,9 +20,10 @@ export function Editor({ placeholder = 'Start writing...', author, content = '',
       }),
     ],
     content,
+    immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: 'prose prose-lg max-w-none focus:outline-none min-h-[400px] p-6',
+        class: 'max-w-none focus:outline-none min-h-[400px] p-6',
       },
     },
     onUpdate: ({ editor }) => {
