@@ -35,7 +35,12 @@ import {
   Bookmark,
   LocationOn,
   FolderOpen,
+  AccountTree,
 } from '@mui/icons-material';
+import CharacterDialog from './CharacterDialog';
+import { CHARACTER_ROLES } from '@/lib/character-presets';
+import ContentTree from './ContentTree';
+import { LevelConfig } from '@/lib/content-presets';
 
 type Chapter = {
   id: string;
@@ -49,6 +54,28 @@ type Project = {
   id: string;
   title: string;
   description: string | null;
+  levelConfig: LevelConfig;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type ContentNode = {
+  id: string;
+  projectId: string;
+  parentId: string | null;
+  title: string;
+  level: number;
+  order: number;
+  children: ContentNode[];
+  createdAt: Date;
+};
+
+type Character = {
+  id: string;
+  projectId: string;
+  name: string;
+  description: string | null;
+  notes: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -56,34 +83,46 @@ type Project = {
 interface SidebarProps {
   projects: Project[];
   currentProject: Project;
-  chapters: Chapter[];
-  selectedChapterId: string | null;
+  contentTree: ContentNode[];
+  characters: Character[];
+  selectedNodeId: string | null;
   onProjectSelect: (projectId: string) => void;
   onNewProject: (title: string, description?: string) => void;
-  onChapterSelect: (chapterId: string) => void;
-  onNewChapter: () => void;
-  onRenameChapter: (chapterId: string, newTitle: string) => void;
-  onDeleteChapter: (chapterId: string) => void;
+  onNodeSelect: (nodeId: string) => void;
+  onCreateNode: (title: string, level: number, parentId?: string) => void;
+  onUpdateNode: (nodeId: string, title: string) => void;
+  onDeleteNode: (nodeId: string) => void;
+  onUpdateLevelConfig: (config: LevelConfig) => void;
+  onCreateCharacter: (characterData: any) => void;
+  onUpdateCharacter: (characterId: string, characterData: any) => void;
+  onDeleteCharacter: (characterId: string) => void;
 }
 
 export default function Sidebar({
   projects,
   currentProject,
-  chapters,
-  selectedChapterId,
+  contentTree,
+  characters,
+  selectedNodeId,
   onProjectSelect,
   onNewProject,
-  onChapterSelect,
-  onNewChapter,
-  onRenameChapter,
-  onDeleteChapter,
+  onNodeSelect,
+  onCreateNode,
+  onUpdateNode,
+  onDeleteNode,
+  onUpdateLevelConfig,
+  onCreateCharacter,
+  onUpdateCharacter,
+  onDeleteCharacter,
 }: SidebarProps) {
   const [editingChapterId, setEditingChapterId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
-  const [expandedPanels, setExpandedPanels] = useState<string[]>(['chapters']);
+  const [expandedPanels, setExpandedPanels] = useState<string[]>(['structure']);
   const [newProjectDialog, setNewProjectDialog] = useState(false);
   const [newProjectTitle, setNewProjectTitle] = useState('');
   const [newProjectDescription, setNewProjectDescription] = useState('');
+  const [characterDialog, setCharacterDialog] = useState(false);
+  const [editingCharacter, setEditingCharacter] = useState<Character | null>(null);
 
   const handlePanelChange = (panel: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
     setExpandedPanels(prev => 
@@ -108,6 +147,26 @@ export default function Sidebar({
     setNewProjectDialog(false);
     setNewProjectTitle('');
     setNewProjectDescription('');
+  };
+
+  const openCreateCharacterDialog = () => {
+    setEditingCharacter(null);
+    setCharacterDialog(true);
+  };
+
+  const openEditCharacterDialog = (character: Character) => {
+    setEditingCharacter(character);
+    setCharacterDialog(true);
+  };
+
+  const handleSaveCharacter = (characterData: any) => {
+    if (editingCharacter) {
+      onUpdateCharacter(editingCharacter.id, characterData);
+    } else {
+      onCreateCharacter(characterData);
+    }
+    setCharacterDialog(false);
+    setEditingCharacter(null);
   };
 
   return (
@@ -200,126 +259,107 @@ export default function Sidebar({
         >
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Person sx={{ mr: 1, color: 'primary.main' }} />
-            <Typography sx={{ fontWeight: 500 }}>Characters</Typography>
+            <Typography sx={{ fontWeight: 500 }}>Characters ({characters.length})</Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ pt: 0 }}>
-            <List dense>
-              <ListItem>
-                <ListItemText 
-                  primary="Emma" 
-                  secondary="12-year-old protagonist, curious and brave"
-                />
-                <ListItemSecondaryAction>
-                  <Chip label="Main" size="small" color="primary" />
-                </ListItemSecondaryAction>
-              </ListItem>
-              <ListItem>
-                <ListItemText 
-                  primary="Mr. Thompson" 
-                  secondary="Emma's father, protective but supportive"
-                />
-                <ListItemSecondaryAction>
-                  <Chip label="Main" size="small" color="primary" />
-                </ListItemSecondaryAction>
-              </ListItem>
-              <ListItem>
-                <ListItemText 
-                  primary="Old Man Jenkins" 
-                  secondary="Mysterious neighbor with secrets"
-                />
-                <ListItemSecondaryAction>
-                  <Chip label="Supporting" size="small" color="secondary" />
-                </ListItemSecondaryAction>
-              </ListItem>
-            </List>
-            <Button startIcon={<Add />} size="small" sx={{ mt: 1 }}>
-              Add Character
-            </Button>
-          </AccordionDetails>
-        </Accordion>
-
-        {/* Chapters */}
-        <Accordion 
-          expanded={expandedPanels.includes('chapters')} 
-          onChange={handlePanelChange('chapters')}
-          sx={{ boxShadow: 'none', '&:before': { display: 'none' } }}
-        >
-          <AccordionSummary expandIcon={<ExpandMore />}>
-            <MenuBook sx={{ mr: 1, color: 'success.main' }} />
-            <Typography sx={{ fontWeight: 500 }}>Chapters</Typography>
-            <Button
-              startIcon={<Add />}
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                onNewChapter();
-              }}
-              sx={{ ml: 'auto', mr: 1 }}
-            >
-              Add
-            </Button>
-          </AccordionSummary>
-          <AccordionDetails sx={{ pt: 0 }}>
-            <Box sx={{ maxHeight: '300px', overflow: 'auto' }}>
-              {chapters.map((chapter) => (
-                <Paper
-                  key={chapter.id}
-                  elevation={0}
-                  sx={{
-                    p: 1.5,
-                    mb: 1,
-                    cursor: 'pointer',
-                    border: 1,
-                    borderColor: selectedChapterId === chapter.id ? 'primary.main' : 'grey.200',
-                    bgcolor: selectedChapterId === chapter.id ? 'primary.50' : 'white',
-                    '&:hover': { bgcolor: selectedChapterId === chapter.id ? 'primary.50' : 'grey.50' }
-                  }}
-                  onClick={() => onChapterSelect(chapter.id)}
+            {characters.length === 0 ? (
+              <Box sx={{ textAlign: 'center', py: 2 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  No characters yet
+                </Typography>
+                <Button 
+                  startIcon={<Add />} 
+                  size="small" 
+                  variant="outlined"
+                  onClick={openCreateCharacterDialog}
                 >
-                  {editingChapterId === chapter.id ? (
-                    <TextField
-                      size="small"
-                      value={editingTitle}
-                      onChange={(e) => setEditingTitle(e.target.value)}
-                      onBlur={() => handleRename(chapter.id)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleRename(chapter.id)}
-                      onClick={(e) => e.stopPropagation()}
-                      autoFocus
-                      fullWidth
-                    />
-                  ) : (
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {chapter.title}
-                      </Typography>
-                      <Box sx={{ display: 'flex', gap: 0.5 }}>
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            startEditing(chapter);
-                          }}
-                        >
-                          <Edit fontSize="small" />
-                        </IconButton>
-                        {chapters.length > 1 && (
+                  Add First Character
+                </Button>
+              </Box>
+            ) : (
+              <>
+                <List dense>
+                  {characters.map((character) => {
+                    const role = CHARACTER_ROLES.find(r => r.value === character.role);
+                    return (
+                      <ListItem 
+                        key={character.id}
+                        sx={{ 
+                          cursor: 'pointer',
+                          '&:hover': { bgcolor: 'grey.100' },
+                          borderRadius: 1,
+                          mb: 0.5
+                        }}
+                        onClick={() => openEditCharacterDialog(character)}
+                      >
+                        <ListItemText 
+                          primary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                {character.name}
+                              </Typography>
+                              {role && (
+                                <Chip 
+                                  label={role.icon + ' ' + role.label}
+                                  size="small"
+                                  color={role.color as any}
+                                  variant="outlined"
+                                />
+                              )}
+                            </Box>
+                          }
+                          secondary={character.description || character.archetype || 'Click to edit'}
+                        />
+                        <ListItemSecondaryAction>
                           <IconButton
                             size="small"
                             onClick={(e) => {
                               e.stopPropagation();
-                              onDeleteChapter(chapter.id);
+                              onDeleteCharacter(character.id);
                             }}
                             sx={{ color: 'error.main' }}
                           >
                             <Delete fontSize="small" />
                           </IconButton>
-                        )}
-                      </Box>
-                    </Box>
-                  )}
-                </Paper>
-              ))}
-            </Box>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    );
+                  })}
+                </List>
+                <Button 
+                  startIcon={<Add />} 
+                  size="small" 
+                  sx={{ mt: 1 }}
+                  onClick={openCreateCharacterDialog}
+                >
+                  Add Character
+                </Button>
+              </>
+            )}
+          </AccordionDetails>
+        </Accordion>
+
+        {/* Story Structure */}
+        <Accordion 
+          expanded={expandedPanels.includes('structure')} 
+          onChange={handlePanelChange('structure')}
+          sx={{ boxShadow: 'none', '&:before': { display: 'none' } }}
+        >
+          <AccordionSummary expandIcon={<ExpandMore />}>
+            <AccountTree sx={{ mr: 1, color: 'success.main' }} />
+            <Typography sx={{ fontWeight: 500 }}>Story Structure</Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ pt: 1 }}>
+            <ContentTree
+              contentTree={contentTree}
+              levelConfig={currentProject.levelConfig || { level1: 'Chapter', level2: 'Section', level3: 'Beat' }}
+              selectedNodeId={selectedNodeId}
+              onNodeSelect={onNodeSelect}
+              onCreateNode={onCreateNode}
+              onUpdateNode={onUpdateNode}
+              onDeleteNode={onDeleteNode}
+              onUpdateLevelConfig={onUpdateLevelConfig}
+            />
           </AccordionDetails>
         </Accordion>
 
@@ -440,6 +480,17 @@ export default function Sidebar({
           </AccordionDetails>
         </Accordion>
       </Box>
+
+      {/* Character Dialog */}
+      <CharacterDialog
+        open={characterDialog}
+        onClose={() => {
+          setCharacterDialog(false);
+          setEditingCharacter(null);
+        }}
+        onSave={handleSaveCharacter}
+        editingCharacter={editingCharacter}
+      />
     </Box>
   );
 }

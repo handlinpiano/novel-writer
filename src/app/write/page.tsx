@@ -1,7 +1,13 @@
-import { getProjects, getChapters, createProject } from '@/app/actions/chapters';
+import { getProjects, createProject } from '@/app/actions/chapters';
+import { getContentTree } from '@/app/actions/content';
+import { getCharacters } from '@/app/actions/characters';
+import { migrateProjectsWithLevelConfig } from '@/app/actions/migrate';
 import WritePageClient from './WritePageClient';
 
 export default async function WritePage() {
+  // Migrate existing projects to have levelConfig
+  await migrateProjectsWithLevelConfig();
+  
   // Get or create default project
   let projects = await getProjects();
   
@@ -11,13 +17,15 @@ export default async function WritePage() {
   }
   
   const currentProject = projects[0];
-  const chapters = await getChapters(currentProject.id);
+  const contentTree = await getContentTree(currentProject.id);
+  const characters = await getCharacters(currentProject.id);
   
   return (
     <WritePageClient 
       initialProjects={projects}
       initialProject={currentProject}
-      initialChapters={chapters}
+      initialContentTree={contentTree}
+      initialCharacters={characters}
     />
   );
 }

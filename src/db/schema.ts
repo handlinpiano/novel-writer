@@ -23,6 +23,8 @@ export const contentNodes = sqliteTable('content_nodes', {
   title: text('title').notNull(),
   level: integer('level').notNull(), // 1 = top level, 2 = second level, 3 = third level
   order: integer('order').notNull(), // order within the parent
+  headNotes: text('head_notes'), // Pre-section notes
+  footNotes: text('foot_notes'), // Post-section notes
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
@@ -33,6 +35,52 @@ export const chapters = sqliteTable('chapters', {
   title: text('title').notNull(),
   order: integer('order').notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+});
+
+// Characters in the story
+export const characters = sqliteTable('characters', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id').notNull().references(() => projects.id),
+  name: text('name').notNull(),
+  description: text('description'),
+  notes: text('notes'), // Character development notes, backstory, etc.
+  
+  // Story Role & Archetype
+  role: text('role').$default('supporting'), // 'protagonist', 'main', 'supporting', 'sidekick', 'antagonist', 'mentor'
+  archetype: text('archetype'), // 'hero', 'mentor', 'trickster', 'sage', 'innocent', 'explorer', 'rebel', 'lover', 'creator', 'caregiver', 'magician', 'ruler'
+  
+  // Appearance (JSON object)
+  appearance: text('appearance', { mode: 'json' }).$defaultFn(() => ({
+    age: 25,
+    height: 'average',
+    build: 'average',
+    hairColor: 'brown',
+    eyeColor: 'brown',
+    distinctiveFeatures: []
+  })),
+  
+  // Personality Traits (0-100 sliders)
+  personality: text('personality', { mode: 'json' }).$defaultFn(() => ({
+    courage: 50,
+    intelligence: 50,
+    charisma: 50,
+    kindness: 50,
+    humor: 50,
+    determination: 50
+  })),
+  
+  // Story Impact & Relationships
+  importanceLevel: integer('importance_level').$default(3), // 1-5 scale
+  relationships: text('relationships', { mode: 'json' }).$defaultFn(() => ({})), // { characterId: 'relationship_type' }
+  
+  // Motivations & Goals
+  motivation: text('motivation'), // What drives this character
+  goals: text('goals'), // What they want to achieve
+  fears: text('fears'), // What they're afraid of
+  secrets: text('secrets'), // Hidden aspects
+  
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
 export const revisions = sqliteTable('revisions', {

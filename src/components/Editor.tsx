@@ -3,6 +3,7 @@
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
+import { Box, Paper, Button, Typography } from '@mui/material';
 
 interface EditorProps {
   placeholder?: string;
@@ -23,7 +24,7 @@ export function Editor({ placeholder = 'Start writing...', author, content = '',
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: 'max-w-none focus:outline-none min-h-[400px] p-6',
+        style: 'outline: none; min-height: 400px; padding: 24px; max-width: none;',
       },
     },
     onUpdate: ({ editor }) => {
@@ -36,64 +37,52 @@ export function Editor({ placeholder = 'Start writing...', author, content = '',
   }
 
   return (
-    <div className="h-full bg-white rounded-lg border border-gray-200 shadow-sm">
+    <Paper sx={{ height: '100%', borderRadius: 2, border: 1, borderColor: 'grey.300' }}>
       {/* Editor Toolbar */}
-      <div className="border-b border-gray-200 p-3 flex items-center space-x-2">
-        <button
+      <Box sx={{ borderBottom: 1, borderColor: 'grey.300', p: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Button
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-            editor.isActive('bold')
-              ? 'bg-gray-900 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
+          variant={editor.isActive('bold') ? 'contained' : 'outlined'}
+          size="small"
         >
           Bold
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-            editor.isActive('italic')
-              ? 'bg-gray-900 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
+          variant={editor.isActive('italic') ? 'contained' : 'outlined'}
+          size="small"
         >
           Italic
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-            editor.isActive('heading', { level: 2 })
-              ? 'bg-gray-900 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
+          variant={editor.isActive('heading', { level: 2 }) ? 'contained' : 'outlined'}
+          size="small"
         >
           Heading
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-            editor.isActive('bulletList')
-              ? 'bg-gray-900 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
+          variant={editor.isActive('bulletList') ? 'contained' : 'outlined'}
+          size="small"
         >
           List
-        </button>
+        </Button>
         
-        <div className="flex-1"></div>
+        <Box sx={{ flex: 1 }} />
         
-        <div className="text-sm text-gray-500">
+        <Typography variant="body2" color="text.secondary">
           {editor.storage.characterCount?.characters() || 0} characters
-        </div>
-      </div>
+        </Typography>
+      </Box>
 
       {/* Editor Content */}
-      <div className="flex-1 overflow-y-auto">
+      <Box sx={{ flex: 1, overflow: 'auto', height: '100%' }}>
         <EditorContent 
           editor={editor} 
-          className="h-full"
+          style={{ height: '100%' }}
         />
-      </div>
-    </div>
+      </Box>
+    </Paper>
   );
 }

@@ -9,6 +9,11 @@ export async function createProject(title: string, description?: string) {
   const [project] = await db.insert(projects).values({
     title,
     description: description || '',
+    levelConfig: {
+      level1: 'Chapter',
+      level2: 'Section', 
+      level3: 'Beat'
+    } as any,
   }).returning();
   
   // Create first chapter automatically
