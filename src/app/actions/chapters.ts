@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { chapters, projects, revisions } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import type { LevelConfig } from '@/types/project';
 
 export async function createProject(title: string, description?: string) {
   const result = await db.insert(projects).values({
@@ -20,7 +21,10 @@ export async function createProject(title: string, description?: string) {
   // Create first chapter automatically
   await createChapter(project.id, 'Chapter 1');
   
-  return project;
+  return {
+    ...project,
+    levelConfig: project.levelConfig as LevelConfig
+  };
 }
 
 export async function updateProject(projectId: string, title: string, description?: string) {
@@ -57,7 +61,11 @@ export async function deleteProject(projectId: string) {
 }
 
 export async function getProjects() {
-  return await db.select().from(projects);
+  const result = await db.select().from(projects);
+  return result.map(project => ({
+    ...project,
+    levelConfig: project.levelConfig as LevelConfig
+  }));
 }
 
 export async function createChapter(projectId: string, title: string) {

@@ -53,7 +53,7 @@ interface CharacterDialogProps {
 
 export default function CharacterDialog({ open, onClose, onSave, editingCharacter }: CharacterDialogProps) {
   const [activeTab, setActiveTab] = useState(0);
-  const [character, setCharacter] = useState({
+  const [character, setCharacter] = useState<any>({
     name: '',
     description: '',
     role: 'supporting',
@@ -61,6 +61,7 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
     appearance: DEFAULT_CHARACTER.appearance,
     personality: DEFAULT_CHARACTER.personality,
     importanceLevel: 3,
+    relationships: {},
     motivation: '',
     goals: '',
     fears: '',
@@ -78,6 +79,7 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
         appearance: editingCharacter.appearance || DEFAULT_CHARACTER.appearance,
         personality: editingCharacter.personality || DEFAULT_CHARACTER.personality,
         importanceLevel: editingCharacter.importanceLevel || 3,
+        relationships: editingCharacter.relationships || {},
         motivation: editingCharacter.motivation || '',
         goals: editingCharacter.goals || '',
         fears: editingCharacter.fears || '',
@@ -93,6 +95,7 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
         appearance: DEFAULT_CHARACTER.appearance,
         personality: DEFAULT_CHARACTER.personality,
         importanceLevel: 3,
+        relationships: {},
         motivation: '',
         goals: '',
         fears: '',

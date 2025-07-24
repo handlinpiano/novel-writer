@@ -6,7 +6,7 @@ import { SmartToy, ExpandMore } from '@mui/icons-material';
 import { createProject, getProjects } from '@/app/actions/chapters';
 import { getContentTree, createContentNode, updateContentNode, deleteContentNode, saveNodeRevision, updateProjectLevelConfig, updateNodeNotes } from '@/app/actions/content';
 import { getCharacters, createCharacter, updateCharacter, deleteCharacter } from '@/app/actions/characters';
-import type { Project, ContentNode } from '@/types/project';
+import type { Project, ContentNode, LevelConfig } from '@/types/project';
 import type { Character, CharacterData } from '@/types/character';
 import { Editor } from '@/components/Editor';
 import Sidebar from '@/components/Sidebar';

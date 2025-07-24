@@ -10,8 +10,8 @@ export interface Project {
   title: string;
   description: string | null;
   levelConfig: LevelConfig;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | null;
+  updatedAt: Date | null;
 }
 
 export interface ContentNode {
