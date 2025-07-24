@@ -15,14 +15,11 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Chip,
   Card,
   CardContent,
   Grid,
   Tabs,
   Tab,
-  Avatar,
-  LinearProgress,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -45,12 +42,13 @@ import {
   PERSONALITY_TRAITS,
   DEFAULT_CHARACTER
 } from '@/lib/character-presets';
+import type { Character, CharacterData } from '@/types/character';
 
 interface CharacterDialogProps {
   open: boolean;
   onClose: () => void;
-  onSave: (character: any) => void;
-  editingCharacter?: any;
+  onSave: (character: CharacterData) => void;
+  editingCharacter?: Character | null;
 }
 
 export default function CharacterDialog({ open, onClose, onSave, editingCharacter }: CharacterDialogProps) {
@@ -121,13 +119,6 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
     }
   };
 
-  const getPersonalityColor = (value: number) => {
-    if (value < 30) return 'error';
-    if (value < 70) return 'warning';
-    return 'success';
-  };
-
-  const selectedRole = CHARACTER_ROLES.find(r => r.value === character.role);
   const selectedArchetype = CHARACTER_ARCHETYPES.find(a => a.value === character.archetype);
 
   return (

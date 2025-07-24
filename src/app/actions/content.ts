@@ -68,7 +68,7 @@ export async function createContentNode(
       )
     );
     
-  const [node] = await db.insert(contentNodes).values({
+  const result = await db.insert(contentNodes).values({
     projectId,
     parentId: parentId || null,
     title,
@@ -76,6 +76,7 @@ export async function createContentNode(
     order: siblings.length,
   }).returning();
   
+  const node = Array.isArray(result) ? result[0] : result;
   // Create initial empty revision for level 3 nodes (leaf nodes)
   if (level === 3) {
     await db.insert(revisions).values({
@@ -144,13 +145,14 @@ export async function getNodeRevisions(nodeId: string) {
 }
 
 export async function saveNodeRevision(nodeId: string, content: string, authorName: string) {
-  const [revision] = await db.insert(revisions).values({
+  const result = await db.insert(revisions).values({
     nodeId,
     content,
     authorId: 'user',
     authorName,
   }).returning();
   
+  const revision = Array.isArray(result) ? result[0] : result;
   revalidatePath('/write');
   return revision;
 }

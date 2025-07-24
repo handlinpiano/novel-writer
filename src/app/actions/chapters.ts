@@ -6,16 +6,17 @@ import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
 export async function createProject(title: string, description?: string) {
-  const [project] = await db.insert(projects).values({
+  const result = await db.insert(projects).values({
     title,
     description: description || '',
     levelConfig: {
       level1: 'Chapter',
       level2: 'Section', 
       level3: 'Beat'
-    } as any,
+    },
   }).returning();
   
+  const project = Array.isArray(result) ? result[0] : result;
   // Create first chapter automatically
   await createChapter(project.id, 'Chapter 1');
   
@@ -65,12 +66,13 @@ export async function createChapter(projectId: string, title: string) {
     .from(chapters)
     .where(eq(chapters.projectId, projectId));
     
-  const [chapter] = await db.insert(chapters).values({
+  const result = await db.insert(chapters).values({
     projectId,
     title,
     order: existingChapters.length,
   }).returning();
   
+  const chapter = Array.isArray(result) ? result[0] : result;
   // Create initial empty revision
   await db.insert(revisions).values({
     chapterId: chapter.id,
@@ -117,13 +119,14 @@ export async function getLatestRevision(chapterId: string) {
 }
 
 export async function saveRevision(chapterId: string, content: string, authorName: string) {
-  const [revision] = await db.insert(revisions).values({
+  const result = await db.insert(revisions).values({
     chapterId,
     content,
     authorId: 'user',
     authorName,
   }).returning();
   
+  const revision = Array.isArray(result) ? result[0] : result;
   revalidatePath('/write');
   return revision;
 }

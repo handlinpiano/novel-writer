@@ -15,7 +15,6 @@ import {
   ListItemSecondaryAction,
   Chip,
   TextField,
-  Paper,
   Select,
   MenuItem,
   FormControl,
@@ -27,10 +26,8 @@ import {
 import {
   ExpandMore,
   Add,
-  Edit,
   Delete,
   Person,
-  MenuBook,
   Note,
   Bookmark,
   LocationOn,
@@ -41,44 +38,8 @@ import CharacterDialog from './CharacterDialog';
 import { CHARACTER_ROLES } from '@/lib/character-presets';
 import ContentTree from './ContentTree';
 import { LevelConfig } from '@/lib/content-presets';
-
-type Chapter = {
-  id: string;
-  projectId: string;
-  title: string;
-  order: number;
-  createdAt: Date;
-};
-
-type Project = {
-  id: string;
-  title: string;
-  description: string | null;
-  levelConfig: LevelConfig;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-type ContentNode = {
-  id: string;
-  projectId: string;
-  parentId: string | null;
-  title: string;
-  level: number;
-  order: number;
-  children: ContentNode[];
-  createdAt: Date;
-};
-
-type Character = {
-  id: string;
-  projectId: string;
-  name: string;
-  description: string | null;
-  notes: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
+import type { Project, ContentNode } from '@/types/project';
+import type { Character, CharacterData } from '@/types/character';
 
 interface SidebarProps {
   projects: Project[];
@@ -93,8 +54,8 @@ interface SidebarProps {
   onUpdateNode: (nodeId: string, title: string) => void;
   onDeleteNode: (nodeId: string) => void;
   onUpdateLevelConfig: (config: LevelConfig) => void;
-  onCreateCharacter: (characterData: any) => void;
-  onUpdateCharacter: (characterId: string, characterData: any) => void;
+  onCreateCharacter: (characterData: CharacterData) => void;
+  onUpdateCharacter: (characterId: string, characterData: CharacterData) => void;
   onDeleteCharacter: (characterId: string) => void;
 }
 
@@ -115,8 +76,6 @@ export default function Sidebar({
   onUpdateCharacter,
   onDeleteCharacter,
 }: SidebarProps) {
-  const [editingChapterId, setEditingChapterId] = useState<string | null>(null);
-  const [editingTitle, setEditingTitle] = useState('');
   const [expandedPanels, setExpandedPanels] = useState<string[]>(['structure']);
   const [newProjectDialog, setNewProjectDialog] = useState(false);
   const [newProjectTitle, setNewProjectTitle] = useState('');
@@ -130,16 +89,6 @@ export default function Sidebar({
         ? [...prev, panel]
         : prev.filter(p => p !== panel)
     );
-  };
-
-  const startEditing = (chapter: Chapter) => {
-    setEditingChapterId(chapter.id);
-    setEditingTitle(chapter.title);
-  };
-
-  const handleRename = (chapterId: string) => {
-    onRenameChapter(chapterId, editingTitle);
-    setEditingChapterId(null);
   };
 
   const handleCreateProject = () => {
@@ -159,7 +108,7 @@ export default function Sidebar({
     setCharacterDialog(true);
   };
 
-  const handleSaveCharacter = (characterData: any) => {
+  const handleSaveCharacter = (characterData: CharacterData) => {
     if (editingCharacter) {
       onUpdateCharacter(editingCharacter.id, characterData);
     } else {
@@ -302,7 +251,7 @@ export default function Sidebar({
                                 <Chip 
                                   label={role.icon + ' ' + role.label}
                                   size="small"
-                                  color={role.color as any}
+                                  color={role.color as 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'}
                                   variant="outlined"
                                 />
                               )}

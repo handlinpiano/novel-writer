@@ -2,8 +2,9 @@
 
 import { db } from '@/db';
 import { characters } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import type { CharacterData } from '@/types/character';
 
 export async function getCharacters(projectId: string) {
   return await db
@@ -13,8 +14,8 @@ export async function getCharacters(projectId: string) {
     .orderBy(characters.name);
 }
 
-export async function createCharacter(projectId: string, characterData: any) {
-  const [character] = await db.insert(characters).values({
+export async function createCharacter(projectId: string, characterData: CharacterData) {
+  const result = await db.insert(characters).values({
     projectId,
     name: characterData.name,
     description: characterData.description || null,
@@ -31,12 +32,13 @@ export async function createCharacter(projectId: string, characterData: any) {
     secrets: characterData.secrets || null,
   }).returning();
   
+  const character = Array.isArray(result) ? result[0] : result;
   revalidatePath('/write');
   return character;
 }
 
-export async function updateCharacter(characterId: string, characterData: any) {
-  const updateData: any = {
+export async function updateCharacter(characterId: string, characterData: CharacterData) {
+  const updateData = {
     updatedAt: new Date(),
     name: characterData.name,
     description: characterData.description || null,

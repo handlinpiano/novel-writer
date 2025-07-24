@@ -28,15 +28,7 @@ import {
 import Link from 'next/link';
 import { createProject } from '@/app/actions/chapters';
 import { useRouter } from 'next/navigation';
-
-type Project = {
-  id: string;
-  title: string;
-  description: string | null;
-  levelConfig: any;
-  createdAt: Date;
-  updatedAt: Date;
-};
+import type { Project } from '@/types/project';
 
 interface ProjectDashboardProps {
   projects: Project[];

@@ -3,52 +3,13 @@
 import { useState } from 'react';
 import { Box, ToggleButton, ToggleButtonGroup, Typography, Paper, Button, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { SmartToy, ExpandMore } from '@mui/icons-material';
-import { createChapter, updateChapterTitle, deleteChapter, saveRevision, createProject, getProjects, getChapters } from '@/app/actions/chapters';
+import { createProject, getProjects } from '@/app/actions/chapters';
 import { getContentTree, createContentNode, updateContentNode, deleteContentNode, saveNodeRevision, updateProjectLevelConfig, updateNodeNotes } from '@/app/actions/content';
 import { getCharacters, createCharacter, updateCharacter, deleteCharacter } from '@/app/actions/characters';
-import { LevelConfig } from '@/lib/content-presets';
+import type { Project, ContentNode } from '@/types/project';
+import type { Character, CharacterData } from '@/types/character';
 import { Editor } from '@/components/Editor';
 import Sidebar from '@/components/Sidebar';
-
-type Project = {
-  id: string;
-  title: string;
-  description: string | null;
-  levelConfig: LevelConfig;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-type Chapter = {
-  id: string;
-  projectId: string;
-  title: string;
-  order: number;
-  createdAt: Date;
-};
-
-type ContentNode = {
-  id: string;
-  projectId: string;
-  parentId: string | null;
-  title: string;
-  level: number;
-  order: number;
-  headNotes: string | null;
-  footNotes: string | null;
-  children: ContentNode[];
-  createdAt: Date;
-};
-
-type Character = {
-  id: string;
-  projectId: string;
-  name: string;
-  description: string | null;
-  notes: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
 
 type Author = 'Dad' | 'Daughter';
 
@@ -174,13 +135,13 @@ export default function WritePageClient({ initialProjects, initialProject, initi
     setContentTree(await getContentTree(currentProject.id));
   };
 
-  const handleCreateCharacter = async (characterData: any) => {
+  const handleCreateCharacter = async (characterData: CharacterData) => {
     await createCharacter(currentProject.id, characterData);
     const updatedCharacters = await getCharacters(currentProject.id);
     setCharacters(updatedCharacters);
   };
 
-  const handleUpdateCharacter = async (characterId: string, characterData: any) => {
+  const handleUpdateCharacter = async (characterId: string, characterData: CharacterData) => {
     await updateCharacter(characterId, characterData);
     const updatedCharacters = await getCharacters(currentProject.id);
     setCharacters(updatedCharacters);
