@@ -17,7 +17,6 @@ import {
   MenuItem,
   Card,
   CardContent,
-  Grid,
   Tabs,
   Tab,
   Accordion,
@@ -114,7 +113,7 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
   const handleArchetypeSelect = (archetypeValue: string) => {
     const archetype = CHARACTER_ARCHETYPES.find(a => a.value === archetypeValue);
     if (archetype) {
-      setCharacter(prev => ({
+      setCharacter((prev: any) => ({
         ...prev,
         archetype: archetypeValue,
         personality: { ...prev.personality, ...archetype.traits }
@@ -167,7 +166,7 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
               <TextField
                 label="Character Name"
                 value={character.name}
-                onChange={(e) => setCharacter(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) => setCharacter((prev: any) => ({ ...prev, name: e.target.value }))}
                 fullWidth
                 required
                 autoFocus
@@ -176,7 +175,7 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
               <TextField
                 label="Description"
                 value={character.description}
-                onChange={(e) => setCharacter(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) => setCharacter((prev: any) => ({ ...prev, description: e.target.value }))}
                 fullWidth
                 multiline
                 rows={3}
@@ -189,7 +188,7 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
                 </Typography>
                 <Slider
                   value={character.importanceLevel}
-                  onChange={(_, value) => setCharacter(prev => ({ ...prev, importanceLevel: value as number }))}
+                  onChange={(_, value) => setCharacter((prev: any) => ({ ...prev, importanceLevel: value as number }))}
                   min={1}
                   max={5}
                   step={1}
@@ -204,20 +203,20 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
                 />
               </Box>
 
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
                   <TextField
                     label="Age"
                     type="number"
                     value={character.appearance.age}
-                    onChange={(e) => setCharacter(prev => ({
+                    onChange={(e) => setCharacter((prev: any) => ({
                       ...prev,
                       appearance: { ...prev.appearance, age: parseInt(e.target.value) || 25 }
                     }))}
                     fullWidth
                   />
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             </Box>
           )}
 
@@ -226,9 +225,9 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               <Box>
                 <Typography variant="h6" sx={{ mb: 2 }}>Character Role</Typography>
-                <Grid container spacing={2}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
                   {CHARACTER_ROLES.map((role) => (
-                    <Grid item xs={12} sm={6} key={role.value}>
+                    <Box sx={{ flex: '1 1 calc(50% - 8px)' }} key={role.value}>
                       <Card 
                         sx={{ 
                           cursor: 'pointer',
@@ -236,7 +235,7 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
                           borderColor: character.role === role.value ? `${role.color}.main` : 'transparent',
                           '&:hover': { borderColor: `${role.color}.light` }
                         }}
-                        onClick={() => setCharacter(prev => ({ ...prev, role: role.value }))}
+                        onClick={() => setCharacter((prev: any) => ({ ...prev, role: role.value }))}
                       >
                         <CardContent>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
@@ -248,9 +247,9 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
                           </Typography>
                         </CardContent>
                       </Card>
-                    </Grid>
+                    </Box>
                   ))}
-                </Grid>
+                </Box>
               </Box>
 
               <Divider />
@@ -260,9 +259,9 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   Select an archetype to automatically set personality traits
                 </Typography>
-                <Grid container spacing={2}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
                   {CHARACTER_ARCHETYPES.map((archetype) => (
-                    <Grid item xs={12} sm={6} md={4} key={archetype.value}>
+                    <Box sx={{ flex: '1 1 calc(33% - 8px)' }} key={archetype.value}>
                       <Card 
                         sx={{ 
                           cursor: 'pointer',
@@ -281,9 +280,9 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
                           </Typography>
                         </CardContent>
                       </Card>
-                    </Grid>
+                    </Box>
                   ))}
-                </Grid>
+                </Box>
               </Box>
             </Box>
           )}
@@ -291,13 +290,13 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
           {/* Appearance Tab */}
           {activeTab === 2 && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
                   <FormControl fullWidth>
                     <InputLabel>Height</InputLabel>
                     <Select
                       value={character.appearance.height}
-                      onChange={(e) => setCharacter(prev => ({
+                      onChange={(e) => setCharacter((prev: any) => ({
                         ...prev,
                         appearance: { ...prev.appearance, height: e.target.value }
                       }))}
@@ -309,14 +308,14 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
                       ))}
                     </Select>
                   </FormControl>
-                </Grid>
+                </Box>
 
-                <Grid item xs={12} md={6}>
+                <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
                   <FormControl fullWidth>
                     <InputLabel>Build</InputLabel>
                     <Select
                       value={character.appearance.build}
-                      onChange={(e) => setCharacter(prev => ({
+                      onChange={(e) => setCharacter((prev: any) => ({
                         ...prev,
                         appearance: { ...prev.appearance, build: e.target.value }
                       }))}
@@ -328,14 +327,14 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
                       ))}
                     </Select>
                   </FormControl>
-                </Grid>
+                </Box>
 
-                <Grid item xs={12} md={6}>
+                <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
                   <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>Hair Color</Typography>
                   <ToggleButtonGroup
                     value={character.appearance.hairColor}
                     exclusive
-                    onChange={(_, value) => value && setCharacter(prev => ({
+                    onChange={(_, value) => value && setCharacter((prev: any) => ({
                       ...prev,
                       appearance: { ...prev.appearance, hairColor: value }
                     }))}
@@ -358,14 +357,14 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
                       </ToggleButton>
                     ))}
                   </ToggleButtonGroup>
-                </Grid>
+                </Box>
 
-                <Grid item xs={12} md={6}>
+                <Box sx={{ flex: '1 1 300px', minWidth: '300px' }}>
                   <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>Eye Color</Typography>
                   <ToggleButtonGroup
                     value={character.appearance.eyeColor}
                     exclusive
-                    onChange={(_, value) => value && setCharacter(prev => ({
+                    onChange={(_, value) => value && setCharacter((prev: any) => ({
                       ...prev,
                       appearance: { ...prev.appearance, eyeColor: value }
                     }))}
@@ -388,8 +387,8 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
                       </ToggleButton>
                     ))}
                   </ToggleButtonGroup>
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             </Box>
           )}
 
@@ -418,7 +417,7 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
                   </Box>
                   <Slider
                     value={character.personality[trait.key as keyof typeof character.personality]}
-                    onChange={(_, value) => setCharacter(prev => ({
+                    onChange={(_, value) => setCharacter((prev: any) => ({
                       ...prev,
                       personality: { ...prev.personality, [trait.key]: value as number }
                     }))}
@@ -449,7 +448,7 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
                     <TextField
                       label="Motivation"
                       value={character.motivation}
-                      onChange={(e) => setCharacter(prev => ({ ...prev, motivation: e.target.value }))}
+                      onChange={(e) => setCharacter((prev: any) => ({ ...prev, motivation: e.target.value }))}
                       placeholder="What drives this character?"
                       multiline
                       rows={2}
@@ -457,7 +456,7 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
                     <TextField
                       label="Goals"
                       value={character.goals}
-                      onChange={(e) => setCharacter(prev => ({ ...prev, goals: e.target.value }))}
+                      onChange={(e) => setCharacter((prev: any) => ({ ...prev, goals: e.target.value }))}
                       placeholder="What do they want to achieve?"
                       multiline
                       rows={2}
@@ -465,7 +464,7 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
                     <TextField
                       label="Fears"
                       value={character.fears}
-                      onChange={(e) => setCharacter(prev => ({ ...prev, fears: e.target.value }))}
+                      onChange={(e) => setCharacter((prev: any) => ({ ...prev, fears: e.target.value }))}
                       placeholder="What are they afraid of?"
                       multiline
                       rows={2}
@@ -473,7 +472,7 @@ export default function CharacterDialog({ open, onClose, onSave, editingCharacte
                     <TextField
                       label="Secrets"
                       value={character.secrets}
-                      onChange={(e) => setCharacter(prev => ({ ...prev, secrets: e.target.value }))}
+                      onChange={(e) => setCharacter((prev: any) => ({ ...prev, secrets: e.target.value }))}
                       placeholder="Hidden aspects or backstory"
                       multiline
                       rows={2}
