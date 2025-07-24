@@ -15,10 +15,10 @@ export const projects = sqliteTable('projects', {
 });
 
 // Flexible content nodes that can represent any hierarchical level
-export const contentNodes = sqliteTable('content_nodes', {
+export const contentNodes: any = sqliteTable('content_nodes', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   projectId: text('project_id').notNull().references(() => projects.id),
-  parentId: text('parent_id').references(() => contentNodes.id), // null for top-level
+  parentId: text('parent_id'), // null for top-level, self-reference
   title: text('title').notNull(),
   level: integer('level').notNull(), // 1 = top level, 2 = second level, 3 = third level
   order: integer('order').notNull(), // order within the parent
@@ -45,7 +45,7 @@ export const characters = sqliteTable('characters', {
   notes: text('notes'), // Character development notes, backstory, etc.
   
   // Story Role & Archetype
-  role: text('role').$default('supporting'), // 'protagonist', 'main', 'supporting', 'sidekick', 'antagonist', 'mentor'
+  role: text('role').$defaultFn(() => 'supporting'), // 'protagonist', 'main', 'supporting', 'sidekick', 'antagonist', 'mentor'
   archetype: text('archetype'), // 'hero', 'mentor', 'trickster', 'sage', 'innocent', 'explorer', 'rebel', 'lover', 'creator', 'caregiver', 'magician', 'ruler'
   
   // Appearance (JSON object)
@@ -69,7 +69,7 @@ export const characters = sqliteTable('characters', {
   })),
   
   // Story Impact & Relationships
-  importanceLevel: integer('importance_level').$default(3), // 1-5 scale
+  importanceLevel: integer('importance_level').$defaultFn(() => 3), // 1-5 scale
   relationships: text('relationships', { mode: 'json' }).$defaultFn(() => ({})), // { characterId: 'relationship_type' }
   
   // Motivations & Goals
@@ -82,16 +82,16 @@ export const characters = sqliteTable('characters', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
-export const revisions = sqliteTable('revisions', {
+export const revisions: any = sqliteTable('revisions', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   // Update to reference contentNodes instead of chapters for new system
-  nodeId: text('node_id').references(() => contentNodes.id),
+  nodeId: text('node_id'),
   // Keep chapterId for backward compatibility
-  chapterId: text('chapter_id').references(() => chapters.id),
+  chapterId: text('chapter_id'),
   content: text('content').notNull(),
   authorId: text('author_id').notNull(), // 'human', 'ai', or user id
   authorName: text('author_name').notNull(), // 'Dad', 'Daughter', 'Claude'
-  parentRevisionId: text('parent_revision_id').references(() => revisions.id),
+  parentRevisionId: text('parent_revision_id'), // self-reference
   aiMetadata: text('ai_metadata', { mode: 'json' }), // stores prompt used, model, etc as JSON
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });

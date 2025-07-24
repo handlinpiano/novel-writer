@@ -9,7 +9,7 @@ import {
   CardContent, 
   CardActionArea,
   Button, 
-  Grid, 
+ 
   Chip,
   Dialog,
   DialogTitle,
@@ -98,9 +98,9 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
             </Button>
           </Box>
         ) : (
-          <Grid container spacing={3}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
             {projects.map((project) => (
-              <Grid item xs={12} sm={6} md={4} key={project.id}>
+              <Box sx={{ flex: '1 1 300px', minWidth: '300px', maxWidth: '400px' }} key={project.id}>
                 <Card sx={{ height: '100%' }}>
                   <CardActionArea 
                     component={Link}
@@ -131,7 +131,7 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
                       <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
                         <Chip 
                           icon={<Schedule />}
-                          label={`Created ${formatDate(project.createdAt)}`}
+                          label={`Created ${formatDate(project.createdAt || new Date())}`}
                           size="small"
                           variant="outlined"
                         />
@@ -165,9 +165,9 @@ export default function ProjectDashboard({ projects }: ProjectDashboardProps) {
                     </CardContent>
                   </CardActionArea>
                 </Card>
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         )}
 
         {/* Floating Action Button */}
